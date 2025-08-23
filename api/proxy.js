@@ -1,6 +1,13 @@
 const axios = require('axios');
 const { pipeline } = require('stream/promises');
 
+// 生成随机IP（模拟动态切换）
+function getRandomIp() {
+    // 这里使用固定IP，如需随机可扩展此函数
+    // 示例：return `220.165.${Math.floor(Math.random() * 256)}.${Math.floor(Math.random() * 256)}`;
+    return '220.165.132.28';
+}
+
 module.exports = async (req, res) => {
     // 设置CORS头
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -25,19 +32,37 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: '缺少必要的id参数' });
     }
 
+    // 获取伪造的IP
+    const fakeIp = getRandomIp();
+    
     try {
         // 目标API地址
         const targetUrl = 'https://www.eev3.com/js/play.php';
+        
+        // 构建包含伪造IP的请求头
+        const fakeIpHeaders = {
+            'x-forwarded-for': fakeIp,
+            'x-remote-IP': fakeIp,
+            'x-remote-ip': fakeIp,
+            'x-client-ip': fakeIp,
+            'x-client-IP': fakeIp,
+            'X-Real-IP': fakeIp,
+            'client-IP': fakeIp,
+            'x-originating-IP': fakeIp,
+            'x-remote-addr': fakeIp,
+            'Client-Ip': fakeIp,
+            'Remote_Addr': fakeIp,
+            // 原有头信息
+            'Referer': `https://www.eev3.com/mp3/${id}.html`,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        };
         
         // 获取音乐信息
         const response = await axios.post(targetUrl, 
             new URLSearchParams({ id, type: 'music' }),
             {
-                headers: {
-                    'Referer': `https://www.eev3.com/mp3/${id}.html`,
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0',
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                headers: fakeIpHeaders
             }
         );
 
@@ -47,7 +72,13 @@ module.exports = async (req, res) => {
         switch (type?.toLowerCase()) {
             case 'pic':
                 if (data.pic) {
-                    const picResponse = await axios.get(data.pic, { responseType: 'stream' });
+                    const picResponse = await axios.get(data.pic, { 
+                        responseType: 'stream',
+                        headers: {
+                            ...fakeIpHeaders, // 图片请求也添加伪造IP头
+                            'Referer': targetUrl // 图片请求的Referer设为目标API
+                        }
+                    });
                     res.setHeader('Content-Type', 'image/jpeg');
                     await pipeline(picResponse.data, res);
                 } else {
@@ -58,7 +89,7 @@ module.exports = async (req, res) => {
             case 'url':
                 if (data.url) {
                     // 处理音频请求，支持范围请求
-                    await handleAudioRequest(data.url, req, res);
+                    await handleAudioRequest(data.url, req, res, fakeIpHeaders);
                 } else {
                     res.status(404).json({ error: '未找到音频资源' });
                 }
@@ -83,10 +114,12 @@ module.exports = async (req, res) => {
 };
 
 // 处理音频请求，支持范围请求
-async function handleAudioRequest(audioUrl, req, res) {
+async function handleAudioRequest(audioUrl, req, res, fakeIpHeaders) {
     try {
-        // 先发送HEAD请求获取文件大小
-        const headResponse = await axios.head(audioUrl);
+        // 先发送HEAD请求获取文件大小（带伪造IP头）
+        const headResponse = await axios.head(audioUrl, {
+            headers: fakeIpHeaders
+        });
         const fileSize = parseInt(headResponse.headers['content-length'], 10);
         
         // 设置基础响应头
@@ -112,10 +145,13 @@ async function handleAudioRequest(audioUrl, req, res) {
                 res.setHeader('Content-Range', `bytes ${start}-${actualEnd}/${fileSize}`);
                 res.setHeader('Content-Length', chunkSize);
                 
-                // 请求并传输指定范围的内容
+                // 请求并传输指定范围的内容（带伪造IP头）
                 const audioResponse = await axios.get(audioUrl, {
                     responseType: 'stream',
-                    headers: { Range: `bytes=${start}-${actualEnd}` }
+                    headers: { 
+                        ...fakeIpHeaders,
+                        'Range': `bytes=${start}-${actualEnd}` 
+                    }
                 });
                 
                 await pipeline(audioResponse.data, res);
@@ -123,9 +159,12 @@ async function handleAudioRequest(audioUrl, req, res) {
             }
         }
         
-        // 如果没有范围请求，返回完整文件
+        // 如果没有范围请求，返回完整文件（带伪造IP头）
         res.setHeader('Content-Length', fileSize);
-        const audioResponse = await axios.get(audioUrl, { responseType: 'stream' });
+        const audioResponse = await axios.get(audioUrl, { 
+            responseType: 'stream',
+            headers: fakeIpHeaders
+        });
         await pipeline(audioResponse.data, res);
         
     } catch (error) {
