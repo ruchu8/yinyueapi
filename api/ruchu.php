@@ -318,33 +318,9 @@ if(isset($_GET['rid'])) {
 
         // 初始化cURL请求获取MP3文件（支持范围请求）
         $mp3Ch = curl_init($url);
-        curl_setopt($mp3Ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYHOST, false);
-        
-        // 如果有范围请求，设置请求头
-        if (!empty($range)) {
-            curl_setopt($mp3Ch, CURLOPT_HTTPHEADER, ["Range: $range"]);
-        }
 
-        // 获取MP3文件内容
-        $mp3Content = curl_exec($mp3Ch);
-        curl_close($mp3Ch);
 
-        // 设置支持快进的响应头
-        header('Content-Type: audio/mpeg');
-        header('Content-Disposition: inline; filename="music.mp3"');
-        header('Accept-Ranges: bytes'); // 告知浏览器支持字节范围请求
-        header("Content-Length: $length");
-        
-        // 如果是部分请求，返回206状态码
-        if (!empty($range)) {
-            http_response_code(206);
-            header("Content-Range: bytes $start-$end/$fileSize");
-        }
-
-        // 输出MP3文件内容
-        echo $mp3Content;
+        echo $url ;
     } else {
         echo "未找到URL";
     }
