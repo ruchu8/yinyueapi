@@ -284,22 +284,27 @@ if(isset($_GET['rid'])) {
     if (isset($matches[1])) {
         $realMp3Url = $matches[1];
         
-        // 2. 清除之前可能输出的任何内容（避免重定向失败）
-        ob_clean(); // 清除输出缓冲区
-        header("Location: " . $realMp3Url, true, 302); // 302临时重定向
-        header("Content-Type: audio/mpeg"); // 标识音频格式（兼容部分严格播放器）
-        exit; // 终止脚本，确保重定向生效
+        // 关键修复：先检查是否有输出缓冲区，再操作
+        if (ob_get_length() > 0) { // 只有存在缓冲区时才清除
+            ob_clean();
+        }
+        
+        // 确保在任何输出之前发送头信息
+        header("Location: " . $realMp3Url, true, 302);
+        header("Content-Type: audio/mpeg");
+        
+        // 立即终止脚本，防止后续输出
+        exit;
         
     } else {
-        http_response_code(404); // 未找到音频时返回404
+        http_response_code(404);
         echo "未找到对应的音频资源";
         exit;
     }
 } else {
-    http_response_code(400); // 参数错误返回400
+    http_response_code(400);
     echo "请传入正确的rid参数（如 ?rid=228911）";
     exit;
 }
-
 
 ?>
