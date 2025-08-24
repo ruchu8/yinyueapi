@@ -276,58 +276,99 @@ https://api.fanxing.life/api/kw.php?rid=228908    直接返回高品音質
 https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇從低到高（yz=1為流暢，yz=5為無損）
 */
 
-if(isset($_GET['rid'])) {
+
+if (isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
-    // 注意：这里需要确保$response变量已正确定义并包含URL信息
+    // 1. （请确保此处$response已正确定义并包含URL信息，例如从接口/数据库获取）
+    // 示例：若$response是类似"url=http://er.sycdn.kuwo.cn/xxx.mp3 ..."的字符串
     preg_match('/url=(.*?)\s/', $response, $matches);
+    
     if (isset($matches[1])) {
-        $url = $matches[1];
+        $realMp3Url = $matches[1]; // 真实MP3地址
+        $realMp3Url = trim($realMp3Url); // 清除URL前后可能的空格（避免无效地址）
 
-        // 首先获取文件大小（需要额外请求一次）
-        $headCh = curl_init($url);
+        // 2. 第一步：请求真实MP3的头部信息，获取文件大小、MIME类型（支持断点续传）
+        $headCh = curl_init($realMp3Url);
         curl_setopt($headCh, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($headCh, CURLOPT_NOBODY, true); // 只请求头部
-        curl_setopt($headCh, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($headCh, CURLOPT_NOBODY, true); // 只请求头部，不下载正文
+        curl_setopt($headCh, CURLOPT_SSL_VERIFYPEER, false); // 忽略SSL证书验证（仅测试用，生产环境建议开启）
         curl_setopt($headCh, CURLOPT_SSL_VERIFYHOST, false);
         curl_exec($headCh);
+        
+        // 获取关键信息：文件大小、MIME类型
         $fileSize = curl_getinfo($headCh, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        $mimeType = curl_getinfo($headCh, CURLINFO_CONTENT_TYPE) ?: 'audio/mpeg'; // 默认为MP3的MIME类型
         curl_close($headCh);
 
-        // 处理字节范围请求
+        // 3. 处理播放器的“字节范围请求”（支持断点续传、进度条）
         $range = '';
+        $start = 0;
+        $end = $fileSize - 1;
+        $length = $fileSize;
+
         if (isset($_SERVER['HTTP_RANGE'])) {
+            // 解析播放器发送的范围请求（如“bytes=1024-2048”）
             preg_match('/bytes=(\d*)-(\d*)/', $_SERVER['HTTP_RANGE'], $rangeMatches);
             $start = intval($rangeMatches[1]);
             $end = $rangeMatches[2] ? intval($rangeMatches[2]) : $fileSize - 1;
-            
-            // 确保范围有效
+
+            // 验证范围有效性，无效则返回416错误
             if ($start > $end || $start >= $fileSize) {
                 http_response_code(416); // 请求范围不符合
                 header("Content-Range: bytes */$fileSize");
                 exit;
             }
-            
+
             $range = "bytes=$start-$end";
             $length = $end - $start + 1;
+            http_response_code(206); // 部分内容响应（断点续传时返回）
         } else {
-            $start = 0;
-            $end = $fileSize - 1;
-            $length = $fileSize;
+            http_response_code(200); // 完整内容响应
         }
 
-        // 初始化cURL请求获取MP3文件（支持范围请求）
-        $mp3Ch = curl_init($url);
+        // 4. 第二步：向真实MP3地址发起请求，获取指定范围的音频数据
+        $mp3Ch = curl_init($realMp3Url);
+        curl_setopt($mp3Ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYHOST, false);
+        
+        // 设置请求范围（支持断点续传）
+        if (!empty($range)) {
+            curl_setopt($mp3Ch, CURLOPT_HTTPHEADER, array("Range: $range"));
+        }
 
+        // 5. 执行请求，获取MP3数据
+        $mp3Data = curl_exec($mp3Ch);
+        $curlErr = curl_errno($mp3Ch);
+        curl_close($mp3Ch);
 
-        echo $url ;
+        // 6. 若请求失败，返回错误
+        if ($curlErr || empty($mp3Data)) {
+            http_response_code(500);
+            echo "获取音频资源失败";
+            exit;
+        }
+
+        // 7. 关键：设置响应头，告诉播放器“这是MP3资源”
+        header("Content-Type: $mimeType"); // 音频MIME类型（如audio/mpeg）
+        header("Content-Length: $length"); // 响应数据的长度
+        header("Content-Range: bytes $start-$end/$fileSize"); // 告知播放器当前返回的字节范围
+        header("Accept-Ranges: bytes"); // 声明支持字节范围请求（断点续传）
+        header("Cache-Control: public, max-age=3600"); // 适当缓存，减少重复请求
+
+        // 8. 输出MP3数据，回传给播放器
+        echo $mp3Data;
+        exit;
+
     } else {
-        echo "未找到URL";
+        http_response_code(404);
+        echo "未找到MP3地址";
     }
 } else {
-    echo "参数错误";
+    http_response_code(400);
+    echo "参数错误：缺少rid";
 }
-
 
 
 ?>
