@@ -193,7 +193,7 @@ function getMusicUrlUrl($id, $format,$br)
 
 // 获取 GET 参数 rid
 $id = isset($_GET['rid']) ? $_GET['rid'] : null;
-$yz = isset($_GET['yz']) ? $_GET['yz'] : '3';
+$yz = isset($_GET['yz']) ? $_GET['yz'] : '4';
 if ($yz == '1') {
     $format = 'acc';
     $br = '64kacc';
