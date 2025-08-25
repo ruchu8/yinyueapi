@@ -279,19 +279,21 @@ https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇�
 if(isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
-    // 1. 解析真实MP3地址（原逻辑保留）
+    // 1. 解析真实MP3地址
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (isset($matches[1])) {
         $realMp3Url = $matches[1];
         
-        // 核心替换：将http://er.sycdn.kuwo.cn替换为https://er-sycdn.kuwo.cn/
-        $realMp3Url = str_replace(
-            'http://er.sycdn.kuwo.cn', 
-            'https://er-sycdn.kuwo.cn', 
+        // 核心正则替换：
+        // 1. 将所有 http://xx.sycdn.kuwo.cn 改为 https://xx-sycdn.kuwo.cn
+        // 2. 支持任意前缀（如 lv、la、er、ra 等）
+        $realMp3Url = preg_replace(
+            '/http:\/\/([a-z0-9]+)\.sycdn\.kuwo\.cn/',
+            'https://$1-sycdn.kuwo.cn',
             $realMp3Url
         );
         
-        // 清除输出缓冲区（确保头信息能正常发送）
+        // 清除输出缓冲区
         if (ob_get_length() > 0) {
             ob_clean();
         }
@@ -299,8 +301,6 @@ if(isset($_GET['rid'])) {
         // 发送重定向头
         header("Location: " . $realMp3Url, true, 302);
         header("Content-Type: audio/mpeg");
-        
-        // 立即终止脚本
         exit;
         
     } else {
@@ -313,5 +313,4 @@ if(isset($_GET['rid'])) {
     echo "请传入正确的rid参数（如 ?rid=228911）";
     exit;
 }
-
 ?>
