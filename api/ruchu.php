@@ -209,7 +209,11 @@ if ($yz == '1') {
 } elseif ($yz == '5') {
     $format = 'flac';
     $br = '2000flac';
-} else {
+}elseif ($yz == '6') {
+    $format = 'm4a';
+    $br = '320m4a';
+}
+ else {
     // 如果 $yz 的值不在上述范围内，默认使用 'mp3' 和 '160kmp3'
     $format = 'mp3';
     $br = '160kmp3';
