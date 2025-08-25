@@ -275,40 +275,27 @@ curl_close($ch);
 https://api.fanxing.life/api/kw.php?rid=228908    直接返回高品音質
 https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇從低到高（yz=1為流暢，yz=5為無損）
 */
-
 if(isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
-    // 1. 解析原始HTTP地址
+    // 1. 解析地址（无论源站返回HTTP还是HTTPS，直接使用）
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (!isset($matches[1])) {
         http_response_code(404);
         echo "未找到音频资源";
         exit;
     }
-    $realMp3Url = $matches[1];
-    // 确保是原始HTTP地址（强制替换HTTPS为HTTP）
-    $realMp3Url = str_replace('https://', 'http://', $realMp3Url);
+    $realUrl = $matches[1];
 
-    // 2. 提取源站域名（如 er.sycdn.kuwo.cn），用于CSP规则
-    $urlParts = parse_url($realMp3Url);
-    $sourceDomain = $urlParts['host'] ?? '';
-
-    // 3. 清除所有输出缓冲（确保头信息能正常发送）
+    // 2. 清除输出缓冲，确保头信息发送
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
 
-    // 4. 核心：设置CSP头，允许从源站HTTP地址加载音频
-    // 这会告诉浏览器/播放器："信任该HTTP地址的音频资源，不要强制升级"
-    $cspHeader = "default-src 'self'; media-src http://{$sourceDomain} https://{$sourceDomain};";
-    header("Content-Security-Policy: {$cspHeader}");
-    header("X-Content-Security-Policy: {$cspHeader}"); // 兼容旧浏览器
-
-    // 5. 轻量跳转（仅返回302头，不传输任何音频数据）
-    header("Location: {$realMp3Url}", true, 302);
+    // 3. 直接跳转到源站最终地址（无论HTTP/HTTPS，由源站决定）
+    header("Location: {$realUrl}", true, 302);
     header("Content-Type: audio/mpeg");
-    header("Cache-Control: no-transform"); // 禁止CDN转换协议
+    header("Cache-Control: no-transform");
     exit;
 
 } else {
@@ -316,5 +303,7 @@ if(isset($_GET['rid'])) {
     echo "请传入正确的rid参数";
     exit;
 }
+
+
 ?>
     
