@@ -279,31 +279,35 @@ https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇�
 if(isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
-    // 1. 解析真实MP3地址（原逻辑保留）
+    // 1. 解析真实MP3地址（保留原逻辑）
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (isset($matches[1])) {
         $realMp3Url = $matches[1];
         
-        // 关键修复：先检查是否有输出缓冲区，再操作
-        if (ob_get_length() > 0) { // 只有存在缓冲区时才清除
-            ob_clean();
+        // 关键：确保地址是HTTP（如果原始解析地址是HTTPS，强制替换为HTTP）
+        // （根据你的需求，只保留原始HTTP，若解析到HTTPS则强制转换）
+        $realMp3Url = str_replace('https://', 'http://', $realMp3Url);
+        
+        // 2. 清除所有输出缓冲，确保头信息能正常发送
+        while (ob_get_level() > 0) {
+            ob_end_clean();
         }
         
-        // 确保在任何输出之前发送头信息
-        header("Location: " . $realMp3Url, true, 302);
+        // 3. 设置重定向头，添加Cache-Control避免CDN缓存和升级
+        header("Location: " . $realMp3Url, true, 302); // 302临时重定向
         header("Content-Type: audio/mpeg");
+        header("Cache-Control: no-transform"); // 禁止CDN转换协议（HTTP→HTTPS）
+        header("X-Content-Type-Options: nosniff"); // 防止MIME类型嗅探
         
-        // 立即终止脚本，防止后续输出
-        exit;
-        
+        exit; // 立即终止脚本，避免任何额外输出
     } else {
         http_response_code(404);
-        echo "未找到对应的音频资源";
+        echo "未找到音频资源";
         exit;
     }
 } else {
     http_response_code(400);
-    echo "请传入正确的rid参数（如 ?rid=228911）";
+    echo "请传入正确的rid参数";
     exit;
 }
 
