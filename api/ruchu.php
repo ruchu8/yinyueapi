@@ -275,27 +275,39 @@ curl_close($ch);
 https://api.fanxing.life/api/kw.php?rid=228908    直接返回高品音質
 https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇從低到高（yz=1為流暢，yz=5為無損）
 */
+ 
 if(isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
-    // 1. 解析地址（无论源站返回HTTP还是HTTPS，直接使用）
+    // 1. 解析原始HTTP地址
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (!isset($matches[1])) {
         http_response_code(404);
         echo "未找到音频资源";
         exit;
     }
-    $realUrl = $matches[1];
+    $realMp3Url = $matches[1];
+    // 确保是HTTP地址（强制替换HTTPS为HTTP）
+    $realMp3Url = str_replace('https://', 'http://', $realMp3Url);
 
-    // 2. 清除输出缓冲，确保头信息发送
+    // 2. 提取源站域名（用于精确CSP配置）
+    $urlParts = parse_url($realMp3Url);
+    $sourceDomain = $urlParts['host'] ?? ''; // 如 er.sycdn.kuwo.cn
+
+    // 3. 清除所有输出缓冲（确保头信息优先发送）
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
 
-    // 3. 直接跳转到源站最终地址（无论HTTP/HTTPS，由源站决定）
-    header("Location: {$realUrl}", true, 302);
+    // 4. 核心头配置：禁用HTTP自动升级，允许HTTP音频
+    header("Location: {$realMp3Url}", true, 302); // 跳转原始HTTP地址
     header("Content-Type: audio/mpeg");
-    header("Cache-Control: no-transform");
+    header("Cache-Control: no-transform"); // 禁止CDN修改协议
+    header("Upgrade-Insecure-Requests: 0"); // 关键：禁用浏览器HTTP自动升级（默认是1）
+    header("Content-Security-Policy: media-src http://{$sourceDomain} 'self';"); // 允许该域名HTTP音频
+    header("X-Content-Security-Policy: media-src http://{$sourceDomain} 'self';"); // 兼容旧浏览器
+    header("Strict-Transport-Security: max-age=0"); // 临时关闭HSTS（避免浏览器强制HTTPS）
+
     exit;
 
 } else {
@@ -303,7 +315,4 @@ if(isset($_GET['rid'])) {
     echo "请传入正确的rid参数";
     exit;
 }
-
-
 ?>
-    
