@@ -214,9 +214,9 @@ if ($yz == '1') {
     $br = '320m4a';
 }
  else {
-    // 如果 $yz 的值不在上述范围内，默认使用 'mp3' 和 '160kmp3'
+    // 如果 $yz 的值不在上述范围内，默认使用 'mp3' 和 '320kmp3'
     $format = 'mp3';
-    $br = '160kmp3';
+    $br = '320kmp3';
 }
 // 调用 getMusicUrlUrl 函数获取音乐 URL
 $musicUrl = getMusicUrlUrl($id,$format,$br);
