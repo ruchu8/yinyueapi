@@ -48,38 +48,7 @@ https://hsplay-360.v.btime.com/live_btime/btv_sn_20170706_s3/index.m3u8?time=175
 #EXTINF:-1 tvg-name="北京卡酷少儿" tvg-logo="https://gh-proxy.com/https://raw.githubusercontent.com/fanmingming/live/main/tv/北京卡酷少儿.png",北京卡酷少儿
 https://hsplay-360.v.btime.com/live_btime/btv_sn_20170706_s10/index.m3u8?time=1759461616&sign=199e5e23d17ef8f2805e3654c90ed0d3
 
-#EXTINF:-1 tvg-name="河南卫视" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/河南卫视.png" group-title="🇨🇳河南地方",河南卫视
-http://tvcdn.stream3.hndt.com/tv/65c4a6d5017e1000b2b6ea2500000000_transios/playlist.m3u8?wsSecret=215ae18a0d62abeafb77e6aeb6fc52dd&wsTime=1759478416
-#EXTINF:-1 tvg-name="新闻频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/新闻频道.png" group-title="🇨🇳河南地方",新闻频道
-http://tvcdn.stream3.hndt.com/tv/65bb6966017e100059b75a8500000000_transios/playlist.m3u8?wsSecret=48cb7e99f8f45e5f1576e5a6392734db&wsTime=1759478416
-#EXTINF:-1 tvg-name="都市频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/都市频道.png" group-title="🇨🇳河南地方",都市频道
-http://tvcdn.stream3.hndt.com/tv/65c3fbc5017e1000fde13faa00000000_transios/playlist.m3u8?wsSecret=03ed38a6fa6d20eba0d307fb73df79b3&wsTime=1759478416
-#EXTINF:-1 tvg-name="民生频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/民生频道.png" group-title="🇨🇳河南地方",民生频道
-http://tvcdn.stream3.hndt.com/tv/65bef28a017e10009c49d5f900000000_transios/playlist.m3u8?wsSecret=057cce431bbd579eab058de853099594&wsTime=1759478416
-#EXTINF:-1 tvg-name="法治频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/法治频道.png" group-title="🇨🇳河南地方",法治频道
-http://tvcdn.stream3.hndt.com/tv/65be54a9017e1000af59fb4800000000_transios/playlist.m3u8?wsSecret=71e4cbab74d183b826056d0a5296c12d&wsTime=1759478416
-#EXTINF:-1 tvg-name="公共频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/公共频道.png" group-title="🇨🇳河南地方",公共频道
-http://tvcdn.stream3.hndt.com/tv/65b93894017e10000ae6b07d00000000_transios/playlist.m3u8?wsSecret=0938979328cb3211f1f19ca62294907b&wsTime=1759478416
-#EXTINF:-1 tvg-name="河南乡村频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/河南乡村频道.png" group-title="🇨🇳河南地方",河南乡村频道
-http://tvcdn.stream3.hndt.com/tv/65b8302b017e100019dc540f00000000_transios/playlist.m3u8?wsSecret=6ad31a5b3cba20f2ab226ed08d1407d4&wsTime=1759478416
-#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/电视剧频道.png" group-title="🇨🇳河南地方",电视剧频道
-http://tvcdn.stream3.hndt.com/tv/65bd329b017e1000648cd2ed00000000_transios/playlist.m3u8?wsSecret=746fb7dab282006fd48be3bf96776c37&wsTime=1759478416
-#EXTINF:-1 tvg-name="梨园频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/梨园频道.png" group-title="🇨🇳河南地方",梨园频道
-https://dxtx.hntv.tv/live/lypd.m3u8?txSecret=10c771842a0be59e8b575d765173ec96&txTime=7B923E0A&wsSecret=251bf82c081d2a814b82dbcfbb2bac00&wsTime=1759478416
-#EXTINF:-1 tvg-name="文物宝库" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/文物宝库.png" group-title="🇨🇳河南地方",文物宝库
-http://tvcdn.stream3.hndt.com/tv/65b5a69d017e1000aa645bea00000000_transios/playlist.m3u8?wsSecret=084a55b940c5b6fd5dd46b36e865aadb&wsTime=1759478416
-#EXTINF:-1 tvg-name="武术频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/武术频道.png" group-title="🇨🇳河南地方",武术频道
-http://tvcdn.stream3.hndt.com/tv/65b4b750017e1000dbb9306200000000_transios/playlist.m3u8?wsSecret=a7a18732bce5d2904a5fe5e65a9f78b5&wsTime=1759478416
-#EXTINF:-1 tvg-name="睛彩中原" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/睛彩中原.png" group-title="🇨🇳河南地方",睛彩中原
-http://tvcdn.stream3.hndt.com/tv/65b27d4c017e100039bd55c200000000_transios/playlist.m3u8?wsSecret=5af040073555a27271bab5e647ca8cd6&wsTime=1759478416
-#EXTINF:-1 tvg-name="移动戏曲频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/移动戏曲频道.png" group-title="🇨🇳河南地方",移动戏曲频道
-https://tvcdn.stream3.hndt.com/tv/160ea8971f8b41f0905f88c7afe3effe_transios/playlist.m3u8?wsSecret=9ffd6f74fb336ff67bf2b32412b06efe&wsTime=1759478416
-#EXTINF:-1 tvg-name="象视界" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/象视界.png" group-title="🇨🇳河南地方",象视界
-http://tvcdn.stream3.hndt.com/tv/d34d1a2b0178100022de972e00000000_transios/playlist.m3u8?wsSecret=e5b6c96a9fe844c6b3671e065009652d&wsTime=1759478416
-#EXTINF:-1 tvg-name="国学频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/国学频道.png" group-title="🇨🇳河南地方",国学频道
-rtmp://rtmp.tv.stream3.hndt.com/tv/647f9277018410008cf925e200000000?wsSecret=9a23316ee66e918684e097f&wsSecret=dd87ac335ed8c7f4e79265ab2772eca5&wsTime=1759478416
-#EXTINF:-1 tvg-name="欢腾购物" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/欢腾购物.png" group-title="🇨🇳河南地方",欢腾购物
-http://tvcdn.stream3.hndt.com/tv/65ba653b017e1000d4ee41c700000000_transios/playlist.m3u8?wsSecret=38e7c28150a7b910c31d5e42a975a01e&wsTime=1759478416
+
 #EXTINF:-1 tvg-name="CCTV1" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/CCTV1.png" group-title="🇨🇳IPV4线路",CCTV-1综合
 http://61.156.228.12:8154/tsfile/live/0001_1.m3u8?key=txiptv&playlive=1&authid=0
 #EXTINF:-1 tvg-name="CCTV2" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/CCTV2.png" group-title="🇨🇳IPV4线路",CCTV2
@@ -1290,3 +1259,36 @@ http://gctxyc.liveplay.myqcloud.com/gc/wgw02_1/index.m3u8
 https://gcalic.v.myalicdn.com/gc/wgw03_1/index.m3u8
 #EXTINF:-1 tvg-name="黄龙" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/黄龙.png" group-title="🇨🇳影音剧场",黄龙
 https://gcalic.v.myalicdn.com/gc/hlzycc_1/index.m3u8
+
+#EXTINF:-1 tvg-name="河南卫视" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/河南卫视.png" group-title="🇨🇳河南地方",河南卫视
+http://tvcdn.stream3.hndt.com/tv/65c4a6d5017e1000b2b6ea2500000000_transios/playlist.m3u8?wsSecret=215ae18a0d62abeafb77e6aeb6fc52dd&wsTime=1759478416
+#EXTINF:-1 tvg-name="新闻频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/新闻频道.png" group-title="🇨🇳河南地方",新闻频道
+http://tvcdn.stream3.hndt.com/tv/65bb6966017e100059b75a8500000000_transios/playlist.m3u8?wsSecret=48cb7e99f8f45e5f1576e5a6392734db&wsTime=1759478416
+#EXTINF:-1 tvg-name="都市频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/都市频道.png" group-title="🇨🇳河南地方",都市频道
+http://tvcdn.stream3.hndt.com/tv/65c3fbc5017e1000fde13faa00000000_transios/playlist.m3u8?wsSecret=03ed38a6fa6d20eba0d307fb73df79b3&wsTime=1759478416
+#EXTINF:-1 tvg-name="民生频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/民生频道.png" group-title="🇨🇳河南地方",民生频道
+http://tvcdn.stream3.hndt.com/tv/65bef28a017e10009c49d5f900000000_transios/playlist.m3u8?wsSecret=057cce431bbd579eab058de853099594&wsTime=1759478416
+#EXTINF:-1 tvg-name="法治频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/法治频道.png" group-title="🇨🇳河南地方",法治频道
+http://tvcdn.stream3.hndt.com/tv/65be54a9017e1000af59fb4800000000_transios/playlist.m3u8?wsSecret=71e4cbab74d183b826056d0a5296c12d&wsTime=1759478416
+#EXTINF:-1 tvg-name="公共频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/公共频道.png" group-title="🇨🇳河南地方",公共频道
+http://tvcdn.stream3.hndt.com/tv/65b93894017e10000ae6b07d00000000_transios/playlist.m3u8?wsSecret=0938979328cb3211f1f19ca62294907b&wsTime=1759478416
+#EXTINF:-1 tvg-name="河南乡村频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/河南乡村频道.png" group-title="🇨🇳河南地方",河南乡村频道
+http://tvcdn.stream3.hndt.com/tv/65b8302b017e100019dc540f00000000_transios/playlist.m3u8?wsSecret=6ad31a5b3cba20f2ab226ed08d1407d4&wsTime=1759478416
+#EXTINF:-1 tvg-name="电视剧频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/电视剧频道.png" group-title="🇨🇳河南地方",电视剧频道
+http://tvcdn.stream3.hndt.com/tv/65bd329b017e1000648cd2ed00000000_transios/playlist.m3u8?wsSecret=746fb7dab282006fd48be3bf96776c37&wsTime=1759478416
+#EXTINF:-1 tvg-name="梨园频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/梨园频道.png" group-title="🇨🇳河南地方",梨园频道
+https://dxtx.hntv.tv/live/lypd.m3u8?txSecret=10c771842a0be59e8b575d765173ec96&txTime=7B923E0A&wsSecret=251bf82c081d2a814b82dbcfbb2bac00&wsTime=1759478416
+#EXTINF:-1 tvg-name="文物宝库" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/文物宝库.png" group-title="🇨🇳河南地方",文物宝库
+http://tvcdn.stream3.hndt.com/tv/65b5a69d017e1000aa645bea00000000_transios/playlist.m3u8?wsSecret=084a55b940c5b6fd5dd46b36e865aadb&wsTime=1759478416
+#EXTINF:-1 tvg-name="武术频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/武术频道.png" group-title="🇨🇳河南地方",武术频道
+http://tvcdn.stream3.hndt.com/tv/65b4b750017e1000dbb9306200000000_transios/playlist.m3u8?wsSecret=a7a18732bce5d2904a5fe5e65a9f78b5&wsTime=1759478416
+#EXTINF:-1 tvg-name="睛彩中原" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/睛彩中原.png" group-title="🇨🇳河南地方",睛彩中原
+http://tvcdn.stream3.hndt.com/tv/65b27d4c017e100039bd55c200000000_transios/playlist.m3u8?wsSecret=5af040073555a27271bab5e647ca8cd6&wsTime=1759478416
+#EXTINF:-1 tvg-name="移动戏曲频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/移动戏曲频道.png" group-title="🇨🇳河南地方",移动戏曲频道
+https://tvcdn.stream3.hndt.com/tv/160ea8971f8b41f0905f88c7afe3effe_transios/playlist.m3u8?wsSecret=9ffd6f74fb336ff67bf2b32412b06efe&wsTime=1759478416
+#EXTINF:-1 tvg-name="象视界" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/象视界.png" group-title="🇨🇳河南地方",象视界
+http://tvcdn.stream3.hndt.com/tv/d34d1a2b0178100022de972e00000000_transios/playlist.m3u8?wsSecret=e5b6c96a9fe844c6b3671e065009652d&wsTime=1759478416
+#EXTINF:-1 tvg-name="国学频道" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/国学频道.png" group-title="🇨🇳河南地方",国学频道
+rtmp://rtmp.tv.stream3.hndt.com/tv/647f9277018410008cf925e200000000?wsSecret=9a23316ee66e918684e097f&wsSecret=dd87ac335ed8c7f4e79265ab2772eca5&wsTime=1759478416
+#EXTINF:-1 tvg-name="欢腾购物" tvg-logo="https://gh.catmak.name/https://raw.githubusercontent.com/fanmingming/live/main/tv/欢腾购物.png" group-title="🇨🇳河南地方",欢腾购物
+http://tvcdn.stream3.hndt.com/tv/65ba653b017e1000d4ee41c700000000_transios/playlist.m3u8?wsSecret=38e7c28150a7b910c31d5e42a975a01e&wsTime=1759478416
