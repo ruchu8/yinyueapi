@@ -279,47 +279,79 @@ https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇�
 if(isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
-    // 检查API响应是否成功
-    if (empty($response)) {
-        http_response_code(500);
-        echo json_encode(['error' => '无法从音乐服务器获取响应', 'url' => $musicUrl]);
-        exit;
-    }
-
-    // 1. 解析真实MP3地址
+    // 注意：这里需要确保$response变量已正确定义并包含URL信息
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (isset($matches[1])) {
-        $realMp3Url = $matches[1];
-        
-        // 核心正则替换：
-        // 1. 将所有 http://xx.sycdn.kuwo.cn 改为 https://xx-sycdn.kuwo.cn
-        // 2. 支持任意前缀（如 lv、la、er、ra 等）
-        $realMp3Url = preg_replace(
-            '/http:\/\/([a-z0-9]+)\.sycdn\.kuwo\.cn/',
-            'https://$1-sycdn.kuwo.cn',
-            $realMp3Url
-        );
-        
-        // 验证URL是否有效
-        if (filter_var($realMp3Url, FILTER_VALIDATE_URL) === false) {
-            http_response_code(404);
-            echo json_encode(['error' => '解析到的音频URL无效', 'url' => $realMp3Url]);
-            exit;
+        $url = $matches[1];
+
+        // 首先获取文件大小（需要额外请求一次）
+        $headCh = curl_init($url);
+        curl_setopt($headCh, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($headCh, CURLOPT_NOBODY, true); // 只请求头部
+        curl_setopt($headCh, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($headCh, CURLOPT_SSL_VERIFYHOST, false);
+        curl_exec($headCh);
+        $fileSize = curl_getinfo($headCh, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        curl_close($headCh);
+
+        // 处理字节范围请求
+        $range = '';
+        if (isset($_SERVER['HTTP_RANGE'])) {
+            preg_match('/bytes=(\d*)-(\d*)/', $_SERVER['HTTP_RANGE'], $rangeMatches);
+            $start = intval($rangeMatches[1]);
+            $end = $rangeMatches[2] ? intval($rangeMatches[2]) : $fileSize - 1;
+            
+            // 确保范围有效
+            if ($start > $end || $start >= $fileSize) {
+                http_response_code(416); // 请求范围不符合
+                header("Content-Range: bytes */$fileSize");
+                exit;
+            }
+            
+            $range = "bytes=$start-$end";
+            $length = $end - $start + 1;
+        } else {
+            $start = 0;
+            $end = $fileSize - 1;
+            $length = $fileSize;
         }
+
+        // 初始化cURL请求获取MP3文件（支持范围请求）
+        $mp3Ch = curl_init($url);
+        curl_setopt($mp3Ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYHOST, false);
         
-        // 在Vercel上，我们不直接代理音频流，而是返回重定向
-        // 这样可以避免响应体过大的问题
-        header("Location: " . $realMp3Url, true, 302);
-        exit;
+        // 如果有范围请求，设置请求头
+        if (!empty($range)) {
+            curl_setopt($mp3Ch, CURLOPT_HTTPHEADER, ["Range: $range"]);
+        }
+
+        // 获取MP3文件内容
+        $mp3Content = curl_exec($mp3Ch);
+        curl_close($mp3Ch);
+
+        // 设置支持快进的响应头
+        header('Content-Type: audio/mpeg');
+        header('Content-Disposition: inline; filename="music.mp3"');
+        header('Accept-Ranges: bytes'); // 告知浏览器支持字节范围请求
+        header("Content-Length: $length");
         
+        // 如果是部分请求，返回206状态码
+        if (!empty($range)) {
+            http_response_code(206);
+            header("Content-Range: bytes $start-$end/$fileSize");
+        }
+
+        // 输出MP3文件内容
+        echo $mp3Content;
     } else {
-        http_response_code(404);
-        echo json_encode(['error' => '未找到对应的音频资源', 'response' => $response]);
-        exit;
+        echo "未找到URL";
     }
 } else {
-    http_response_code(400);
-    echo json_encode(['error' => '请传入正确的rid参数（如 ?rid=228911）']);
-    exit;
+    echo "参数错误";
 }
+
+
+
 ?>
