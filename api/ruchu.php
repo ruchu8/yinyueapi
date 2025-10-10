@@ -193,7 +193,7 @@ function getMusicUrlUrl($id, $format,$br)
 
 // 获取 GET 参数 rid
 $id = isset($_GET['rid']) ? $_GET['rid'] : null;
-$yz = isset($_GET['yz']) ? $_GET['yz'] : '4';
+$yz = isset($_GET['yz']) ? $_GET['yz'] : '3';
 if ($yz == '1') {
     $format = 'acc';
     $br = '64kacc';
@@ -209,14 +209,10 @@ if ($yz == '1') {
 } elseif ($yz == '5') {
     $format = 'flac';
     $br = '2000flac';
-}elseif ($yz == '6') {
-    $format = 'm4a';
-    $br = '320m4a';
-}
- else {
-    // 如果 $yz 的值不在上述范围内，默认使用 'mp3' 和 '320kmp3'
+} else {
+    // 如果 $yz 的值不在上述范围内，默认使用 'mp3' 和 '160kmp3'
     $format = 'mp3';
-    $br = '320kmp3';
+    $br = '160kmp3';
 }
 // 调用 getMusicUrlUrl 函数获取音乐 URL
 $musicUrl = getMusicUrlUrl($id,$format,$br);
@@ -283,10 +279,26 @@ https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇�
 if(isset($_GET['rid'])) {
     $rid = $_GET['rid'];
 
+    // 输出调试信息
+    error_log("RID: " . $rid);
+    error_log("Music URL: " . $musicUrl);
+    error_log("API Response: " . $response);
+    
+    // 检查API响应是否成功
+    if (empty($response)) {
+        http_response_code(500);
+        echo "无法从音乐服务器获取响应\n";
+        echo "请求URL: " . htmlspecialchars($musicUrl) . "\n";
+        exit;
+    }
+
     // 1. 解析真实MP3地址
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (isset($matches[1])) {
         $realMp3Url = $matches[1];
+        
+        // 输出调试信息
+        error_log("Parsed URL: " . $realMp3Url);
         
         // 核心正则替换：
         // 1. 将所有 http://xx.sycdn.kuwo.cn 改为 https://xx-sycdn.kuwo.cn
@@ -297,19 +309,66 @@ if(isset($_GET['rid'])) {
             $realMp3Url
         );
         
+        // 验证URL是否有效
+        if (filter_var($realMp3Url, FILTER_VALIDATE_URL) === false) {
+            http_response_code(404);
+            echo "解析到的音频URL无效\n";
+            echo "解析后的URL: " . htmlspecialchars($realMp3Url) . "\n";
+            echo "原始API响应: " . htmlspecialchars($response) . "\n";
+            exit;
+        }
+        
         // 清除输出缓冲区
         if (ob_get_length() > 0) {
             ob_clean();
         }
         
-        // 发送重定向头
-        header("Location: " . $realMp3Url, true, 302);
+        // 设置适当的头部信息以支持在线播放
         header("Content-Type: audio/mpeg");
+        header("Accept-Ranges: bytes");
+        
+        // 使用cURL获取音频流并直接输出到浏览器
+        $audioStream = curl_init($realMp3Url);
+        curl_setopt($audioStream, CURLOPT_RETURNTRANSFER, false);
+        curl_setopt($audioStream, CURLOPT_HEADER, false);
+        curl_setopt($audioStream, CURLOPT_BUFFERSIZE, 8192); // 设置缓冲区大小
+        curl_setopt($audioStream, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($audioStream, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($audioStream, CURLOPT_TIMEOUT, 30);
+        
+        // 设置与上面相同的User-Agent和IP头
+        curl_setopt($audioStream, CURLOPT_USERAGENT, $mobileUserAgent);
+        curl_setopt($audioStream, CURLOPT_HTTPHEADER, $headers);
+        
+        // 执行请求并将音频流输出到浏览器
+        $result = curl_exec($audioStream);
+        
+        // 检查是否有错误
+        if (curl_errno($audioStream)) {
+            http_response_code(502);
+            echo "获取音频流时出错: " . curl_error($audioStream);
+            curl_close($audioStream);
+            exit;
+        }
+        
+        $httpCode = curl_getinfo($audioStream, CURLINFO_HTTP_CODE);
+        if ($httpCode >= 400) {
+            http_response_code($httpCode);
+            echo "音频服务器返回错误: " . $httpCode . "\n";
+            echo "请求的URL: " . htmlspecialchars($realMp3Url) . "\n";
+            curl_close($audioStream);
+            exit;
+        }
+        
+        curl_close($audioStream);
         exit;
         
     } else {
+        // 输出调试信息
         http_response_code(404);
-        echo "未找到对应的音频资源";
+        echo "未找到对应的音频资源\n";
+        echo "API响应内容: " . htmlspecialchars($response) . "\n";
+        echo "请求URL: " . htmlspecialchars($musicUrl) . "\n";
         exit;
     }
 } else {
