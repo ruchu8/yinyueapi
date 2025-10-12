@@ -1,6 +1,4 @@
 <?php
-
-
 $hexs = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
 
 function hex2Str($hx)
@@ -183,17 +181,19 @@ function base64_encrypt($msg)
     $s = base64_encode(implode($b2));
     return str_replace(["\r\n", "\n"], '', $s);
 }
-function getMusicUrlUrl($id, $format,$br)
+
+function getMusicUrlUrl($id, $format, $br)
 {
     $willEnc = "user=0&android_id=0&prod=kwplayer_ar_8.5.5.0&corp=kuwo&newver=3&vipver=8.5.5.0&source=kwplayer_ar_8.5.5.0_apk_keluze.apk&p2p=1&notrace=0&type=convert_url2&br={$br}&format={$format}&sig=0&rid={$id}&priority=bitrate&loginUid=0&network=WIFI&loginSid=0&mode=download";
-    $url ="http://mobi.kuwo.cn/mobi.s?f=kuwo&q=" . base64_encrypt($willEnc);
-
+    $url = "http://mobi.kuwo.cn/mobi.s?f=kuwo&q=" . base64_encrypt($willEnc);
     return $url;
 }
 
 // 获取 GET 参数 rid
 $id = isset($_GET['rid']) ? $_GET['rid'] : null;
 $yz = isset($_GET['yz']) ? $_GET['yz'] : '3';
+
+// 根据音质参数设置格式和比特率
 if ($yz == '1') {
     $format = 'acc';
     $br = '64kacc';
@@ -210,148 +210,69 @@ if ($yz == '1') {
     $format = 'flac';
     $br = '2000flac';
 } else {
-    // 如果 $yz 的值不在上述范围内，默认使用 'mp3' 和 '160kmp3'
     $format = 'mp3';
     $br = '160kmp3';
 }
-// 调用 getMusicUrlUrl 函数获取音乐 URL
-$musicUrl = getMusicUrlUrl($id,$format,$br);
- 
-// -------------------------------------------------------------------------------
 
-function getRandomChineseIP() {
-    $ipRanges = array(
-        array('36.56.0.0', '36.63.255.255')
+// 调用函数获取音乐 URL
+$musicUrl = getMusicUrlUrl($id, $format, $br);
 
-    );
-
+// 设置随机国内IP
+function getRandomChineseIP()
+{
+    $ipRanges = [
+        ['36.56.0.0', '36.63.255.255']
+    ];
     $ipRange = $ipRanges[array_rand($ipRanges)];
     $ipStart = ip2long($ipRange[0]);
     $ipEnd = ip2long($ipRange[1]);
-    $randomIP = long2ip(rand($ipStart, $ipEnd));
-    return $randomIP;
+    return long2ip(rand($ipStart, $ipEnd));
 }
 
-// -------------------------- 关键修改：添加手机UA请求头 --------------------------
+// 初始化 cURL 请求
 $ch = curl_init($musicUrl);
-// 1. 设置手机端 User-Agent（模拟 Android 手机Chrome浏览器，可根据需求替换为其他手机UA）
 $mobileUserAgent = 'Mozilla/5.0 (Linux; Android 13; SM-G9980) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Mobile Safari/537.36';
 curl_setopt($ch, CURLOPT_USERAGENT, $mobileUserAgent);
-// 2. 保留原有配置（返回结果不直接输出）
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-// 3. （可选）添加HTTPS兼容配置（若目标接口升级为HTTPS，避免SSL证书验证错误）
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
-// 4. 设置随机的国内IP地址
+// 设置随机IP头
 $randomIP = getRandomChineseIP();
-$headers = array(
+$headers = [
     'X-Forwarded-For: ' . $randomIP,
-    'X-Remote-IP: ' . $randomIP,
-    'X-Remote-ip: ' . $randomIP,
-    'X-Client-IP: ' . $randomIP,
-    'X-Client-IP: ' . $randomIP,
     'X-Real-IP: ' . $randomIP,
-    'Client-Ip: ' . $randomIP,
-    'Remote_Addr: ' . $randomIP,
-    'Client-Ip: ' . $randomIP,
-    'Remote_Addr: ' . $randomIP
-);
+    'Client-Ip: ' . $randomIP
+];
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-// 输出请求头
-// echo "请求头:\n";
-// foreach ($headers as $header) {
-//     echo $header . "\n";
-// }
-
-// -------------------------------------------------------------------------------
-
+// 执行请求并获取响应
 $response = curl_exec($ch);
 curl_close($ch);
 
-/*
-调用如下：
-https://api.fanxing.life/api/kw.php?rid=228908    直接返回高品音質
-https://api.fanxing.life/api/kw.php?rid=228908&yz=音質選擇1-5  音質選擇從低到高（yz=1為流暢，yz=5為無損）
-*/
-
-if(isset($_GET['rid'])) {
-    $rid = $_GET['rid'];
-
-    // 注意：这里需要确保$response变量已正确定义并包含URL信息
+// 处理响应并执行302重定向
+if (isset($_GET['rid'])) {
+    // 解析真实音频URL
     preg_match('/url=(.*?)\s/', $response, $matches);
     if (isset($matches[1])) {
-        $url = $matches[1];
-
-        // 首先获取文件大小（需要额外请求一次）
-        $headCh = curl_init($url);
-        curl_setopt($headCh, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($headCh, CURLOPT_NOBODY, true); // 只请求头部
-        curl_setopt($headCh, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($headCh, CURLOPT_SSL_VERIFYHOST, false);
-        curl_exec($headCh);
-        $fileSize = curl_getinfo($headCh, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-        curl_close($headCh);
-
-        // 处理字节范围请求
-        $range = '';
-        if (isset($_SERVER['HTTP_RANGE'])) {
-            preg_match('/bytes=(\d*)-(\d*)/', $_SERVER['HTTP_RANGE'], $rangeMatches);
-            $start = intval($rangeMatches[1]);
-            $end = $rangeMatches[2] ? intval($rangeMatches[2]) : $fileSize - 1;
-            
-            // 确保范围有效
-            if ($start > $end || $start >= $fileSize) {
-                http_response_code(416); // 请求范围不符合
-                header("Content-Range: bytes */$fileSize");
-                exit;
-            }
-            
-            $range = "bytes=$start-$end";
-            $length = $end - $start + 1;
-        } else {
-            $start = 0;
-            $end = $fileSize - 1;
-            $length = $fileSize;
-        }
-
-        // 初始化cURL请求获取MP3文件（支持范围请求）
-        $mp3Ch = curl_init($url);
-        curl_setopt($mp3Ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($mp3Ch, CURLOPT_SSL_VERIFYHOST, false);
+        $realMp3Url = $matches[1];
         
-        // 如果有范围请求，设置请求头
-        if (!empty($range)) {
-            curl_setopt($mp3Ch, CURLOPT_HTTPHEADER, ["Range: $range"]);
-        }
-
-        // 获取MP3文件内容
-        $mp3Content = curl_exec($mp3Ch);
-        curl_close($mp3Ch);
-
-        // 设置支持快进的响应头
-        header('Content-Type: audio/mpeg');
-        header('Content-Disposition: inline; filename="music.mp3"');
-        header('Accept-Ranges: bytes'); // 告知浏览器支持字节范围请求
-        header("Content-Length: $length");
+        // 替换URL协议格式（http -> https，解决可能的跨域问题）
+        $realMp3Url = preg_replace(
+            '/http:\/\/([a-z0-9]+)\.sycdn\.kuwo\.cn/',
+            'https://$1-sycdn.kuwo.cn',
+            $realMp3Url
+        );
         
-        // 如果是部分请求，返回206状态码
-        if (!empty($range)) {
-            http_response_code(206);
-            header("Content-Range: bytes $start-$end/$fileSize");
-        }
-
-        // 输出MP3文件内容
-        echo $mp3Content;
+        // 执行302重定向（核心修改：仅返回跳转指令，不传输音频内容）
+        header("Location: " . $realMp3Url, true, 302);
+        exit;
     } else {
-        echo "未找到URL";
+        http_response_code(404);
+        echo "未找到对应的音频资源";
     }
 } else {
-    echo "参数错误";
+    http_response_code(400);
+    echo "请传入正确的rid参数（如 ?rid=228911）";
 }
-
-
-
 ?>
