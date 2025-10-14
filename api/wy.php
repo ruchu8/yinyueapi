@@ -6,6 +6,9 @@
 
 namespace Metowolf;
 
+// 解决headers already sent问题：开启输出缓冲
+ob_start();
+
 // 1. 配置网易云音乐Cookie（若获取失效，替换为自己的Cookie）
 $netease_cookie = 'NMTID=00OXmulainmPg73okSRvUAdXFM3Gk4AAAGScBw7gw; JSESSIONID-WYYY=Za34q%2BSACyZKfxmcVTiCGuiubVb63hHPbpWBzZUM1ur2Jn2XvXVyg6EDs93gUQ23xrQufKuAQlVlggkFp7HipKa37s%2Fk6cXpcEgdFbKA%5CAElO03N%2BX8NseWmPVQzZ7bvUngbR%2FAO6lHR32Cf%2BVMx80%5C9yXOuQRaN5YI8V9n7k5%2FtSt6m%3A1728459551542; _iuqxldmzr_=32; _ntes_nnid=8ca1df07817e02979e9f7b55155bf6ef,1728457751559; _ntes_nuid=8ca1df07817e02979e9f7b55155bf6ef; WEVNSM=1.0.0; WNMCID=uaabkp.1728457752773.01.0; WM_NI=cmGJdvXChwWAAPme2p8wqkJQu7UYbQwhxw9PiuzXA2I6uHplOvM1BZ1SIdHMEAXxscCV0UyZbObqCuzAqiMEYKkoMWeP9ZoyHyTe4wM8wnv28OIciuwWx7ByNIoHnYnkdHM%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6ee8ad042b5b186d5ef3fbcb08ea6c15a968b8facc76098ac9eb6aa5bac869683b82af0fea7c3b92aa1b389abe77e9c9da898d64b8390a386b17cfca9bf8cc95bb7e99bbae15bb5b8b898bc5cababb6b9c43a8beabba9f3688daa83d2c152f38d8785cb47879f9899f269818a00b6fc52a291ae92c27fba9fbf8ad04f9b95a590d05da790f7bbee738ca79c86b77d8fe8b98ff53afc918784ec7fb589b8d8c1738e97a1a9ed53aeb5aca9d037e2a3; WM_TID=MVWFox6vlNlBVAQAUFaGWS4UV6R1YcO5; sDeviceId=YD-Rrv0ryUqWVxFVgUREAfDHDoVV6EkYrow; ntes_utid=tid._.c14VwfI8PR1BAwEAUAPCWG9QUrQkfW%252FI._.0';
 
@@ -142,7 +145,8 @@ class Meting {
 
         // RSA加密处理
         if (extension_loaded('bcmath')) {
-            $skey = strrev(utf8_encode($skey));
+            // 修复：使用mb_convert_encoding替代已弃用的utf8_encode
+            $skey = strrev(mb_convert_encoding($skey, 'UTF-8', 'ISO-8859-1'));
             $skey = $this->bchexdec($this->str2hex($skey));
             $skey = bcpowmod($skey, $pubkey, $modulus);
             $skey = $this->bcdechex($skey);
@@ -251,3 +255,7 @@ if (empty($audioUrl) || !filter_var($audioUrl, FILTER_VALIDATE_URL)) {
 }
 header("Location: " . $audioUrl, true, 302);
 exit;
+
+// 结束输出缓冲
+ob_end_flush();
+?>
