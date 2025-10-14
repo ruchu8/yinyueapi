@@ -1,9 +1,4 @@
 <?php
-/**************************************************
- * 网易云音乐ID转播放地址（302重定向版）
- * 功能：传入网易云音乐ID，直接重定向到真实MP3地址
- *************************************************/
-
 namespace Metowolf;
 
 // 1. 配置网易云音乐Cookie（若获取失效，替换为自己的Cookie）
@@ -122,9 +117,10 @@ class Meting {
             $body = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $skey, $body . str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
         }
 
-        // RSA加密处理
+        // RSA加密处理 - 修复utf8_encode() deprecated问题
         if (extension_loaded('bcmath')) {
-            $skey = strrev(utf8_encode($skey));
+            // 使用mb_convert_encoding替代utf8_encode
+            $skey = strrev(mb_convert_encoding($skey, 'UTF-8', 'ISO-8859-1'));
             $skey = $this->bchexdec($this->str2hex($skey));
             $skey = bcpowmod($skey, $pubkey, $modulus);
             $skey = $this->bcdechex($skey);
@@ -193,6 +189,10 @@ class Meting {
     }
 }
 
+// 关闭错误输出，防止header发送前有内容输出
+error_reporting(0);
+ini_set('display_errors', 0);
+
 // 3. 核心业务逻辑：获取ID → 调用接口 → 302重定向
 use Metowolf\Meting;
 // 从URL参数获取网易云音乐ID（如 ?id=1449559488）
@@ -220,3 +220,4 @@ if (empty($audioUrl) || !filter_var($audioUrl, FILTER_VALIDATE_URL)) {
 // 执行302临时重定向（浏览器会直接打开MP3地址播放）
 header("Location: " . $audioUrl, true, 302);
 exit;
+    
