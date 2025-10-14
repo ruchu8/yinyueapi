@@ -42,7 +42,7 @@ class Meting {
         // 网易云音乐URL接口配置
         $api = [
             'method' => 'POST',
-            'url'    => 'http://music.163.com/api/song/enhance/player/url',
+            'url'    => 'https://music.163.com/api/song/enhance/player/url', // 改为HTTPS接口
             'body'   => ['ids' => [$id], 'br' => $br * 1000],
             'encode' => 'netease_AESCBC',
             'decode' => 'netease_url',
@@ -84,7 +84,8 @@ class Meting {
         // CURL基础配置
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 1); // 启用SSL验证
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2); // 严格验证SSL
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($curl, CURLOPT_TIMEOUT, 15);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
@@ -117,9 +118,8 @@ class Meting {
             $body = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $skey, $body . str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
         }
 
-        // RSA加密处理 - 修复utf8_encode() deprecated问题
+        // RSA加密处理 - 使用mb_convert_encoding替代utf8_encode
         if (extension_loaded('bcmath')) {
-            // 使用mb_convert_encoding替代utf8_encode
             $skey = strrev(mb_convert_encoding($skey, 'UTF-8', 'ISO-8859-1'));
             $skey = $this->bchexdec($this->str2hex($skey));
             $skey = bcpowmod($skey, $pubkey, $modulus);
@@ -129,7 +129,8 @@ class Meting {
             $skey = '85302b818aea19b68db899c25dac229412d9bba9b3fcfe4f714dc016bc1686fc446a08844b1f8327fd9cb623cc189be00c5a365ac835e93d4858ee66f43fdc59e32aaed3ef24f0675d70172ef688d376a4807228c55583fe5bac647d10ecef15220feef61477c28cae8406f6f9896ed329d6db9f88757e31848a6c2ce2f94308';
         }
 
-        // 重组请求参数
+        // 重组请求参数，确保使用HTTPS
+        $api['url'] = str_replace('http://', 'https://', $api['url']);
         $api['url'] = str_replace('/api/', '/weapi/', $api['url']);
         $api['body'] = ['params' => $body, 'encSecKey' => $skey];
         return $api;
@@ -142,8 +143,10 @@ class Meting {
         if (isset($data['data'][0]['uf']['url'])) {
             $data['data'][0]['url'] = $data['data'][0]['uf']['url'];
         }
-        // 返回URL或空值（失败时）
-        return isset($data['data'][0]['url']) ? $data['data'][0]['url'] : '';
+        
+        // 确保URL是HTTPS
+        $url = isset($data['data'][0]['url']) ? $data['data'][0]['url'] : '';
+        return str_replace('http://', 'https://', $url);
     }
 
     // 辅助方法：生成随机16进制字符串
@@ -209,6 +212,9 @@ if (empty($musicId) || !is_numeric($musicId) || strlen($musicId) < 8 || strlen($
 $api = new Meting();
 $api->cookie($netease_cookie); // 设置网易云Cookie
 $audioUrl = $api->url($musicId, 320); // 320kbps音质（可改为128/192）
+
+// 再次确保URL是HTTPS
+$audioUrl = str_replace('http://', 'https://', $audioUrl);
 
 // 验证播放地址有效性并执行302重定向
 if (empty($audioUrl) || !filter_var($audioUrl, FILTER_VALIDATE_URL)) {
